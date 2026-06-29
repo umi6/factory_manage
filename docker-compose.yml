@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5173:5173"
+      - "3141:3141"
+    environment:
+      APP_DB_PATH: /app/data/app.db
+      MASTER_DB_PATH: /app/data/master.db
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
