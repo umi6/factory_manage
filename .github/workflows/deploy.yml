@@ -25,7 +25,7 @@ jobs:
     deploy:
         env:
             VITE_BASE_PATH: /factory_manage/
-        VITE_USE_DEMO_DATA: "true"
+            VITE_USE_DEMO_DATA: "true"
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
