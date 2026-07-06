@@ -13,6 +13,7 @@ type DemoBom = {
 };
 
 type DemoInputRecord = {
+  id: string;
   name: string;
   qty: number;
   supplier: string;
@@ -20,6 +21,7 @@ type DemoInputRecord = {
 };
 
 type DemoOutputRecord = {
+  id: string;
   name: string;
   qty: number;
   customer: string;
@@ -27,6 +29,7 @@ type DemoOutputRecord = {
 };
 
 type DemoAchieveRecord = {
+  id: string;
   achieve_id: string;
   item_name: string;
   qty: number;
@@ -92,8 +95,15 @@ const createSeedState = (): DemoState => ({
     "製品A": 6,
   },
   inputs: [
-    { name: "ねじ", qty: 50, supplier: "Demo Supplier", date: "2026-06-28" },
     {
+      id: "input-001",
+      name: "ねじ",
+      qty: 50,
+      supplier: "Demo Supplier",
+      date: "2026-06-28",
+    },
+    {
+      id: "input-002",
       name: "ベースプレート",
       qty: 20,
       supplier: "Demo Supplier",
@@ -101,11 +111,29 @@ const createSeedState = (): DemoState => ({
     },
   ],
   outputs: [
-    { name: "製品A", qty: 2, customer: "Sample Customer", date: "2026-07-01" },
+    {
+      id: "output-001",
+      name: "製品A",
+      qty: 2,
+      customer: "Sample Customer",
+      date: "2026-07-01",
+    },
   ],
   achieves: [
-    { achieve_id: "achieve-001", item_name: "サブユニットA", qty: 4, date: "2026-07-02" },
-    { achieve_id: "achieve-002", item_name: "製品A", qty: 2, date: "2026-07-03" },
+    {
+      id: "achieve-001",
+      achieve_id: "achieve-001",
+      item_name: "サブユニットA",
+      qty: 4,
+      date: "2026-07-02",
+    },
+    {
+      id: "achieve-002",
+      achieve_id: "achieve-002",
+      item_name: "製品A",
+      qty: 2,
+      date: "2026-07-03",
+    },
   ],
   counters: {
     part: 202,
@@ -139,7 +167,7 @@ const getState = (): DemoState => {
   }
 
   try {
-    return JSON.parse(saved) as DemoState;
+      return normalizeState(JSON.parse(saved) as DemoState);
   } catch {
     const seed = createSeedState();
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seed));
@@ -150,6 +178,29 @@ const getState = (): DemoState => {
 const saveState = (state: DemoState) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 };
+
+const normalizeState = (state: DemoState): DemoState => ({
+  ...state,
+  inputs: state.inputs.map((record, index) => ({
+    ...record,
+    id: record.id ?? `input-${String(index + 1).padStart(3, "0")}`,
+  })),
+  outputs: state.outputs.map((record, index) => ({
+    ...record,
+    id: record.id ?? `output-${String(index + 1).padStart(3, "0")}`,
+  })),
+  achieves: state.achieves.map((record, index) => ({
+    ...record,
+    id:
+      record.id ??
+      record.achieve_id ??
+      `achieve-${String(index + 1).padStart(3, "0")}`,
+    achieve_id:
+      record.achieve_id ??
+      record.id ??
+      `achieve-${String(index + 1).padStart(3, "0")}`,
+  })),
+});
 
 const getBomByItemName = (state: DemoState, itemName: string) =>
   state.boms.find((bom) => bom.item_name === itemName);
@@ -534,6 +585,7 @@ const handlePost = async (state: DemoState, url: URL, request: Request) => {
 
     state.stocks[name] = (state.stocks[name] ?? 0) + qty;
     const record = {
+      id: nextId("input", state.counters.input++),
       name,
       qty,
       supplier: body.supplier ?? "",
@@ -565,6 +617,7 @@ const handlePost = async (state: DemoState, url: URL, request: Request) => {
 
     state.stocks[name] = stock - qty;
     state.outputs.unshift({
+      id: nextId("output", state.counters.output++),
       name,
       qty,
       customer: body.customer ?? "",
@@ -600,8 +653,10 @@ const handlePost = async (state: DemoState, url: URL, request: Request) => {
     }
 
     updateStockByTree(state, name, qty);
+    const achieveId = nextId("achieve", state.counters.achieve++);
     state.achieves.unshift({
-      achieve_id: nextId("achieve", state.counters.achieve++),
+      id: achieveId,
+      achieve_id: achieveId,
       item_name: name,
       qty,
       date: body.achievement_date ?? new Date().toISOString().slice(0, 10),
