@@ -8,5 +8,5 @@ export default defineConfig({
     react(),
     babel({ presets: [reactCompilerPreset()] })
   ],
-  base:"/vite-project/",
+  base: process.env.VITE_BASE_PATH ?? "/",
 })

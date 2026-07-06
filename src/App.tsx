@@ -3,7 +3,7 @@ import "./App.css";
 //import Stack from '@mui/material/Stack';
 import Header from "./components/Header";
 import SideMenu from "./components/sideMenu";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Parts from "./pages/Parts";
 //import EditParts from "./pages/PartListAndEdit";
 // import DeleteParts from "./pages/PartsDelete";
@@ -17,11 +17,29 @@ import ExportParts from "./pages/ExportParts";
 import MakeRecord from "./pages/MakeRecord";
 import Inventory from "./pages/Inventory";
 import Help from "./pages/help";
+import { isDemoMode } from "./utils/demoApi";
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="App">
+        {isDemoMode && (
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 1000,
+              padding: "8px 16px",
+              backgroundColor: "#1f3f35",
+              color: "#fff",
+              fontSize: 14,
+              letterSpacing: 0.2,
+            }}
+          >
+            デモ表示中です。GitHub Pages
+            ではローカルのサンプルデータを使っています。
+          </div>
+        )}
         <div className="main-layout">
           <div id="side-menu">
             <SideMenu />
@@ -46,7 +64,7 @@ function App() {
           </main>
         </div>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

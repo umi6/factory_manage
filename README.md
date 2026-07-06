@@ -2,6 +2,11 @@
 `docker-compose up --build`を実行してサービスを起動します.
 `http://localhost:5173`にアクセスすることでサービスを使用することができます.
 
+# Web公開
+GitHub Pages で公開する場合は、`main` ブランチへ push すると `.github/workflows/deploy.yml` が実行され、静的ファイルが自動デプロイされます.
+
+公開先は GitHub Pages の設定画面で確認できます. GitHub Pages 上ではデモデータを使うため、一覧表示や登録操作をそのまま試せます. 実データで運用する場合は、`src/server.js` の API を別途公開して接続してください.
+
 
 # サービスの機能
 
